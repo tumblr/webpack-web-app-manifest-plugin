@@ -69,6 +69,7 @@ describe('webpack-web-app-manifest-plugin', () => {
         name: 'Tumblr',
         short_name: 'Tumblr',
         background_color: '#36465d',
+        theme_color: '#36465d',
         display: 'standalone',
       },
       destination: '/manifest',
@@ -84,6 +85,7 @@ describe('webpack-web-app-manifest-plugin', () => {
     expect(webAppManifestContents.name).toEqual('Tumblr');
     expect(webAppManifestContents.short_name).toEqual('Tumblr');
     expect(webAppManifestContents.background_color).toEqual('#36465d');
+    expect(webAppManifestContents.theme_color).toEqual('#36465d');
     expect(webAppManifestContents.display).toEqual('standalone');
   });
 
