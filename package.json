@@ -27,7 +27,7 @@
     "jest": "^23.4.2",
     "jest-junit": "^5.1.0",
     "md5": "^2.2.1",
-    "webpack": "^3.11.0"
+    "webpack": "^4.29.0"
   },
   "jest": {
     "testMatch": [
