@@ -141,6 +141,8 @@ class WebAppManifestPlugin {
     getIconSize = defaultGetIconSize,
     getIconType = defaultGetIconType,
   }) {
+    this.name = 'webpack-web-app-manifest';
+
     this.content = validatedManifestContent(content);
 
     this.destination = destination;
@@ -155,7 +157,7 @@ class WebAppManifestPlugin {
     This needs to be attached to the 'emit' event in order for the manifest file to be
     saved to the filesystem by Webpack
     */
-    compiler.plugin('emit', (compilation, callback) => {
+    compiler.hooks.emit.tap(this.name, compilation => {
       /*
       Builds up the icons object for the manifest by filtering through all of the
       webpack assets and calculating the sizes and type of image from the fileName.
@@ -210,8 +212,6 @@ class WebAppManifestPlugin {
       chunk.ids = [];
       chunk.files = [filename];
       compilation.chunks.push(chunk);
-
-      callback();
     });
   }
 }
