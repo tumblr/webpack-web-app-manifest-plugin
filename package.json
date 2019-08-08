@@ -24,10 +24,10 @@
   "author": "Paul Rehkugler",
   "license": "MIT",
   "dependencies": {
-    "jest": "^23.4.2",
-    "jest-junit": "^5.1.0",
+    "jest": "^24.8.0",
+    "jest-junit": "^7.0.0",
     "md5": "^2.2.1",
-    "webpack": "^4.29.0"
+    "webpack": "^4.39.1"
   },
   "jest": {
     "testMatch": [

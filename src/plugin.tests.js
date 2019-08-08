@@ -3,7 +3,11 @@ const Chunk = require('webpack/lib/Chunk');
 
 describe('webpack-web-app-manifest-plugin', () => {
   const makeMockCompiler = (compilation, callback = () => null) => ({
-    plugin: (pluginEventName, emitHook) => emitHook(compilation, callback),
+    hooks: {
+      emit: {
+        tap: (_pluginName, emitHook) => emitHook(compilation, callback),
+      }
+    }
   });
 
   const makeMockCompilation = (assets = []) => ({
@@ -229,20 +233,5 @@ describe('webpack-web-app-manifest-plugin', () => {
     const webAppManifestContents = manifest.source();
 
     expect(manifest.size()).toEqual(webAppManifestContents.length);
-  });
-
-  it('calls the callback to let webpack resume execution', () => {
-    const callbackSpy = jest.fn();
-
-    const compilation = makeMockCompilation();
-    const compiler = makeMockCompiler(compilation, callbackSpy);
-    const plugin = new WebAppManifestPlugin({
-      content: {},
-      destination: 'manifest',
-    });
-
-    plugin.apply(compiler);
-
-    expect(callbackSpy).toHaveBeenCalled();
   });
 });
