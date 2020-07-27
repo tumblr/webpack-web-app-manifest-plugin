@@ -10,14 +10,14 @@ describe('webpack-web-app-manifest-plugin', () => {
     }
   });
 
-  const makeMockCompilation = (assets = []) => ({
+  const makeMockCompilation = (assets = [], publicPath = '') => ({
     assets: assets.reduce((memo, assetName) => {
       // eslint-disable-next-line security/detect-object-injection, no-param-reassign
       memo[assetName] = {};
       return memo;
     }, {}),
     chunks: [],
-    options: { output: { publicPath: '' } },
+    options: { output: { publicPath } },
   });
 
   const getManifestFileNameFromCompilationAssets = compilationAssets => {
@@ -139,6 +139,40 @@ describe('webpack-web-app-manifest-plugin', () => {
 
     assets.forEach(({ dimension, name, type }) => {
       const iconsWhoseSrcMatchesName = icons.filter(icon => icon.src === `/${name}`);
+      expect(iconsWhoseSrcMatchesName).toHaveLength(1);
+
+      const icon = iconsWhoseSrcMatchesName[0];
+      expect(icon.type).toEqual(type);
+      expect(icon.sizes).toEqual(`${dimension}x${dimension}`);
+    });
+  });
+
+  it('correctly adds icons with an absolute public path', () => {
+    const assets = [40, 80, 120, 180].map(dimension => ({
+      dimension,
+      name: `manifest/icon_${dimension}-assethash.png`,
+      type: 'image/png',
+    }));
+
+    const publicPath = '/assets/'
+    const compilation = makeMockCompilation(assets.map(asset => asset.name), publicPath);
+    const compiler = makeMockCompiler(compilation);
+    const plugin = new WebAppManifestPlugin({
+      content: {},
+      destination: '/manifest',
+    });
+
+    plugin.apply(compiler);
+
+    const webAppManifestContentsString = getManifestFromCompilationAssets(
+      compilation.assets,
+    ).source();
+    const webAppManifestContents = JSON.parse(webAppManifestContentsString);
+
+    const icons = webAppManifestContents.icons;
+
+    assets.forEach(({ dimension, name, type }) => {
+      const iconsWhoseSrcMatchesName = icons.filter(icon => icon.src === `/assets/${name}`);
       expect(iconsWhoseSrcMatchesName).toHaveLength(1);
 
       const icon = iconsWhoseSrcMatchesName[0];

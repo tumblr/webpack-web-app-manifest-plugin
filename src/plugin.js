@@ -2,25 +2,33 @@ const Chunk = require('webpack/lib/Chunk');
 const md5 = require('md5');
 
 /**
+ * Strips trailing slashes from `path`.
+ *
+ * @param {*} path
+ * @returns `path` without trailing slashes.
+ */
+function trimSlashRight(path) {
+  return path.slice(-1) === '/' ? path.slice(0, path.length - 1) : path;
+}
+
+/**
+ * Strips leading slashes from `path`.
+ *
+ * @param {*} path
+ * @returns `path` without leading slashes.
+ */
+function trimSlashLeft(path) {
+  return path.charAt(0) === '/' ? path.slice(1) : path;
+}
+
+/**
  * Strips leading and trailing slashes from `path`.
  *
  * @param {*} path
  * @returns `path` without leading and trailing slashes.
  */
 function normalizePath(path) {
-  let newPath = path;
-
-  const firstLetter = newPath.charAt(0);
-  if (firstLetter === '/') {
-    newPath = newPath.slice(1);
-  }
-
-  const lastLetter = newPath.slice(-1);
-  if (lastLetter === '/') {
-    newPath = newPath.slice(0, newPath.length - 1);
-  }
-
-  return newPath;
+  return trimSlashRight(trimSlashLeft(path));
 }
 
 /**
@@ -178,7 +186,7 @@ class WebAppManifestPlugin {
       const icons = iconAssets.map(({ fileName, sizes, type }) => ({
         type,
         sizes,
-        src: `${normalizePath(compilation.options.output.publicPath)}/${fileName}`,
+        src: `${trimSlashRight(compilation.options.output.publicPath)}/${fileName}`,
       }));
 
       const content = JSON.stringify({ ...this.content, icons });
