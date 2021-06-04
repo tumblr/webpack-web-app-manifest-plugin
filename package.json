@@ -28,6 +28,7 @@
     "webpack": "^5.0.0"
   },
   "devDependencies": {
+    "file-loader": "^6.2.0",
     "jest": "^24.8.0",
     "jest-junit": "^7.0.0",
     "prettier": "^2.3.0"

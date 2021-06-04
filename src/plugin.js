@@ -1,4 +1,4 @@
-const md5 = require("md5");
+const md5 = require('md5');
 
 /**
  * Strips trailing slashes from `path`.
@@ -7,7 +7,7 @@ const md5 = require("md5");
  * @returns `path` without trailing slashes.
  */
 function trimSlashRight(path) {
-  return path.slice(-1) === "/" ? path.slice(0, path.length - 1) : path;
+  return path.slice(-1) === '/' ? path.slice(0, path.length - 1) : path;
 }
 
 /**
@@ -17,7 +17,7 @@ function trimSlashRight(path) {
  * @returns `path` without leading slashes.
  */
 function trimSlashLeft(path) {
-  return path.charAt(0) === "/" ? path.slice(1) : path;
+  return path.charAt(0) === '/' ? path.slice(1) : path;
 }
 
 /**
@@ -99,9 +99,7 @@ const defaultIsAssetManifestIcon = (fileName) =>
  * @returns an object with width and height keys that describe the size of the image.
  */
 const defaultGetIconSize = (fileName) => {
-  const dimension = fileName.match(
-    /manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/
-  )[1];
+  const dimension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)[1];
   return { width: dimension, height: dimension };
 };
 
@@ -115,9 +113,7 @@ const defaultGetIconSize = (fileName) => {
  * @returns the mime type of the image, as inferred by the file extension.
  */
 const defaultGetIconType = (fileName) => {
-  const extension = fileName.match(
-    /manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/
-  )[2];
+  const extension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)[2];
   return `image/${extension}`;
 };
 
@@ -151,8 +147,9 @@ class WebAppManifestPlugin {
     isAssetManifestIcon = defaultIsAssetManifestIcon,
     getIconSize = defaultGetIconSize,
     getIconType = defaultGetIconType,
+    selfHash = true,
   }) {
-    this.name = "webpack-web-app-manifest";
+    this.name = 'webpack-web-app-manifest';
 
     this.content = validatedManifestContent(content);
 
@@ -161,6 +158,7 @@ class WebAppManifestPlugin {
     this.isAssetManifestIcon = isAssetManifestIcon;
     this.getIconSize = getIconSize;
     this.getIconType = getIconType;
+    this.selfHash = selfHash;
   }
 
   apply(compiler) {
@@ -182,6 +180,7 @@ class WebAppManifestPlugin {
           */
           const { isAssetManifestIcon, getIconSize, getIconType } = this;
 
+          
           const iconAssets = Object.keys(assets)
             .filter((fileName) => isAssetManifestIcon(fileName))
             .map((fileName) => {
@@ -195,16 +194,19 @@ class WebAppManifestPlugin {
           const icons = iconAssets.map(({ fileName, sizes, type }) => ({
             type,
             sizes,
-            src: `${trimSlashRight(
-              compilation.options.output.publicPath
-            )}/${fileName}`,
+            src: `${trimSlashRight(compilation.options.output.publicPath)}/${fileName}`,
           }));
 
-          const content = JSON.stringify({ ...this.content, icons });
+          const content = JSON.stringify({ ...this.content, icons }, null, 2);
 
-          const hash = md5(content).substring(0, 8);
           const normalizedDestination = normalizePath(this.destination);
-          const filename = `${normalizedDestination}/manifest-${hash}.json`;
+          let filename;
+          if (this.selfHash) {
+            const hash = md5(content).substring(0, 8);
+            filename = `${normalizedDestination}/manifest-${hash}.json`;
+          } else {
+            filename = `${normalizedDestination}/manifest.json`;
+          }
 
           /*
           This adds the app manifest as an asset to Webpack.
@@ -217,11 +219,11 @@ class WebAppManifestPlugin {
             compilation.getStats().assetsByChunkName. In this case, we are making a chunk called
             'app-manifest' with just this file in it.
           */
-          const chunk = new webpack.Chunk("app-manifest");
+          const chunk = new webpack.Chunk('app-manifest');
           chunk.ids = [];
           chunk.files.add(filename);
           compilation.chunks.add(chunk);
-        }
+        },
       );
     });
   }
