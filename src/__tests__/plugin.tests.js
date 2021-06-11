@@ -4,7 +4,10 @@ const path = require('path');
 const fs = require('fs/promises');
 const rimraf = require('rimraf').sync;
 
+jest.mock('md5', () => () => '*hash*');
+
 const distPath = path.join(__dirname, '..', '..', '.test-output');
+
 const cleanTestOutput = () => rimraf(distPath);
 beforeEach(() => {
   cleanTestOutput();
@@ -15,7 +18,6 @@ afterAll(() => {
 
 describe('webpack-web-app-manifest-plugin', () => {
   async function runCompilation(plugin, publicPath = '/') {
-    plugin.selfHash = false;
     return new Promise((resolve, reject) => {
       webpack(
         {
@@ -57,7 +59,14 @@ describe('webpack-web-app-manifest-plugin', () => {
           }
           try {
             const contents = JSON.parse(
-              await fs.readFile(path.join(distPath, plugin.destination, 'manifest.json'), 'utf-8'),
+              await fs.readFile(
+                path.join(
+                  distPath,
+                  plugin.destination,
+                  `manifest${plugin.selfHash ? '-*hash*' : ''}.json`,
+                ),
+                'utf-8',
+              ),
             );
             resolve([contents, stats]);
           } catch (e) {
@@ -217,7 +226,21 @@ describe('webpack-web-app-manifest-plugin', () => {
     expect(manifest).toBeTruthy();
 
     expect(stats.toJson().assetsByChunkName['app-manifest']).toEqual([
-      'web-app-manifest/manifest.json',
+      'web-app-manifest/manifest-*hash*.json',
     ]);
+  });
+
+  it('respects selfHash option', async () => {
+    const plugin = new WebAppManifestPlugin({
+      content: {},
+      destination: '/manifest',
+      selfHash: false,
+    });
+
+    const [manifest, stats] = await runCompilation(plugin);
+
+    expect(manifest).toBeTruthy();
+
+    expect(stats.toJson().assetsByChunkName['app-manifest']).toEqual(['manifest/manifest.json']);
   });
 });
