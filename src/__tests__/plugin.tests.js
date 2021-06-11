@@ -31,7 +31,7 @@ describe('webpack-web-app-manifest-plugin', () => {
     return compilationAssets[manifestFileName];
   };
 
-  const distPath = path.join(__dirname, '..', '..', 'dist');
+  const distPath = path.join(__dirname, '..', '..', '.test-output');
 
   async function runCompilation(plugin, publicPath = '/') {
     plugin.selfHash = false;
