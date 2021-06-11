@@ -1,0 +1,5 @@
+.prettierrc
+node_modules
+reports
+.test-output
+src/__tests__/
