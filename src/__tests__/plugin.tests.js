@@ -205,7 +205,7 @@ describe('webpack-web-app-manifest-plugin', () => {
     });
 
     const [manifest, stats] = await runCompilation(plugin);
-    
+
     expect(manifest).toBeTruthy();
 
     expect(stats.toJson().assetsByChunkName['app-manifest']).toEqual([

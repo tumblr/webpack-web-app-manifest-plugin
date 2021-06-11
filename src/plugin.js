@@ -180,7 +180,6 @@ class WebAppManifestPlugin {
           */
           const { isAssetManifestIcon, getIconSize, getIconType } = this;
 
-          
           const iconAssets = Object.keys(assets)
             .filter((fileName) => isAssetManifestIcon(fileName))
             .map((fileName) => {
