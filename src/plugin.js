@@ -147,7 +147,6 @@ class WebAppManifestPlugin {
     isAssetManifestIcon = defaultIsAssetManifestIcon,
     getIconSize = defaultGetIconSize,
     getIconType = defaultGetIconType,
-    selfHash = true,
   }) {
     this.name = 'webpack-web-app-manifest';
 
@@ -158,7 +157,6 @@ class WebAppManifestPlugin {
     this.isAssetManifestIcon = isAssetManifestIcon;
     this.getIconSize = getIconSize;
     this.getIconType = getIconType;
-    this.selfHash = selfHash;
   }
 
   apply(compiler) {
@@ -200,12 +198,8 @@ class WebAppManifestPlugin {
 
           const normalizedDestination = normalizePath(this.destination);
           let filename;
-          if (this.selfHash) {
-            const hash = md5(content).substring(0, 8);
-            filename = `${normalizedDestination}/manifest-${hash}.json`;
-          } else {
-            filename = `${normalizedDestination}/manifest.json`;
-          }
+          const hash = md5(content).substring(0, 8);
+          filename = `${normalizedDestination}/manifest-${hash}.json`;
 
           /*
           This adds the app manifest as an asset to Webpack.

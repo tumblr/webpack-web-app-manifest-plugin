@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs/promises');
 const rimraf = require('rimraf').sync;
 
-jest.mock('md5', () => () => '*hash*');
+jest.mock('md5', () => () => 'hash');
 
 const distPath = path.join(__dirname, '..', '..', '.test-output');
 
@@ -63,7 +63,7 @@ describe('webpack-web-app-manifest-plugin', () => {
                 path.join(
                   distPath,
                   plugin.destination,
-                  `manifest${plugin.selfHash ? '-*hash*' : ''}.json`,
+                  `manifest-hash.json`,
                 ),
                 'utf-8',
               ),
@@ -226,21 +226,7 @@ describe('webpack-web-app-manifest-plugin', () => {
     expect(manifest).toBeTruthy();
 
     expect(stats.toJson().assetsByChunkName['app-manifest']).toEqual([
-      'web-app-manifest/manifest-*hash*.json',
+      'web-app-manifest/manifest-hash.json',
     ]);
-  });
-
-  it('respects selfHash option', async () => {
-    const plugin = new WebAppManifestPlugin({
-      content: {},
-      destination: '/manifest',
-      selfHash: false,
-    });
-
-    const [manifest, stats] = await runCompilation(plugin);
-
-    expect(manifest).toBeTruthy();
-
-    expect(stats.toJson().assetsByChunkName['app-manifest']).toEqual(['manifest/manifest.json']);
   });
 });
