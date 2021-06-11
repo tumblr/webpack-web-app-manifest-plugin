@@ -1,36 +1,9 @@
 const WebAppManifestPlugin = require('webpack-web-app-manifest-plugin');
-const { Chunk, webpack } = require('webpack');
+const { webpack } = require('webpack');
 const path = require('path');
 const fs = require('fs/promises');
 
 describe('webpack-web-app-manifest-plugin', () => {
-  const makeCompiler = (assets = [], publicPath = '') => ({
-    assets: assets.reduce((memo, assetName) => {
-      // eslint-disable-next-line security/detect-object-injection, no-param-reassign
-      memo[assetName] = {};
-      return memo;
-    }, {}),
-    chunks: [],
-    options: { output: { publicPath } },
-  });
-
-  const getManifestFileNameFromCompilationAssets = (compilationAssets) => {
-    const allJsonAssets = Object.keys(compilationAssets).filter((fileName) =>
-      fileName.match(/\.json$/),
-    );
-
-    // to simplify things for these tests, we are not going to have any other JSON assets in the
-    // webpack output
-    expect(allJsonAssets).toHaveLength(1);
-    return allJsonAssets[0];
-  };
-
-  const getManifestFromCompilationAssets = (compilationAssets) => {
-    const manifestFileName = getManifestFileNameFromCompilationAssets(compilationAssets);
-    // eslint-disable-next-line security/detect-object-injection
-    return compilationAssets[manifestFileName];
-  };
-
   const distPath = path.join(__dirname, '..', '..', '.test-output');
 
   async function runCompilation(plugin, publicPath = '/') {
