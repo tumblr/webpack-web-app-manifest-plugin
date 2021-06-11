@@ -209,7 +209,7 @@ describe('webpack-web-app-manifest-plugin', () => {
   it('correctly normalizes compilation output paths', async () => {
     const plugin = new WebAppManifestPlugin({
       content: {},
-      destination: '/web-app-manifest/', // destination has a trailing slash for this test
+      destination: 'web-app-manifest/', // destination has a trailing slash instead of leading for this test
     });
 
     const [manifest, stats] = await runCompilation(plugin);
