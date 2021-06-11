@@ -2,10 +2,18 @@ const WebAppManifestPlugin = require('webpack-web-app-manifest-plugin');
 const { webpack } = require('webpack');
 const path = require('path');
 const fs = require('fs/promises');
+const rimraf = require('rimraf').sync;
+
+const distPath = path.join(__dirname, '..', '..', '.test-output');
+const cleanTestOutput = () => rimraf(distPath);
+beforeEach(() => {
+  cleanTestOutput();
+});
+afterAll(() => {
+  cleanTestOutput();
+});
 
 describe('webpack-web-app-manifest-plugin', () => {
-  const distPath = path.join(__dirname, '..', '..', '.test-output');
-
   async function runCompilation(plugin, publicPath = '/') {
     plugin.selfHash = false;
     return new Promise((resolve, reject) => {
