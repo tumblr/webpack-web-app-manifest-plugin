@@ -37,6 +37,7 @@
     "webpack": "^5.0.0"
   },
   "jest": {
+    "testEnvironment": "node",
     "testMatch": [
       "**/*.tests.js"
     ],
