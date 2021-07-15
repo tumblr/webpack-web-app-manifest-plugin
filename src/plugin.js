@@ -37,7 +37,6 @@ function normalizePath(path) {
  * @returns Content that is valid as an App Manifest key.
  */
 function validatedManifestContent(manifestContent) {
-  /* eslint-disable camelcase */
   // Pulls all known keys out of the manifest content object
   const {
     name,
@@ -63,15 +62,12 @@ function validatedManifestContent(manifestContent) {
     icons,
     related_applications,
   };
-  /* eslint-enable camelcase */
 
   // Strip out undefined from validatedManifest
   Object.keys(validatedManifest).forEach((key) => {
-    /* eslint-disable security/detect-object-injection */
     if (validatedManifest[key] === undefined) {
       delete validatedManifest[key];
     }
-    /* eslint-enable security/detect-object-injection */
   });
 
   return validatedManifest;
@@ -204,7 +200,6 @@ class WebAppManifestPlugin {
           /*
           This adds the app manifest as an asset to Webpack.
           */
-          // eslint-disable-next-line security/detect-object-injection, no-param-reassign
           compilation.emitAsset(filename, new RawSource(content));
 
           /*
