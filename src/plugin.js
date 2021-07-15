@@ -1,4 +1,3 @@
-const Chunk = require('webpack/lib/Chunk');
 const md5 = require('md5');
 
 /**
@@ -38,7 +37,6 @@ function normalizePath(path) {
  * @returns Content that is valid as an App Manifest key.
  */
 function validatedManifestContent(manifestContent) {
-  /* eslint-disable camelcase */
   // Pulls all known keys out of the manifest content object
   const {
     name,
@@ -64,15 +62,12 @@ function validatedManifestContent(manifestContent) {
     icons,
     related_applications,
   };
-  /* eslint-enable camelcase */
 
   // Strip out undefined from validatedManifest
-  Object.keys(validatedManifest).forEach(key => {
-    /* eslint-disable security/detect-object-injection */
+  Object.keys(validatedManifest).forEach((key) => {
     if (validatedManifest[key] === undefined) {
       delete validatedManifest[key];
     }
-    /* eslint-enable security/detect-object-injection */
   });
 
   return validatedManifest;
@@ -87,7 +82,7 @@ function validatedManifestContent(manifestContent) {
  *
  * @returns true, if the filename is to be included in the list of web app manifest icons.
  */
-const defaultIsAssetManifestIcon = fileName =>
+const defaultIsAssetManifestIcon = (fileName) =>
   !!fileName.match(/manifest\/icon_\d+-\w*\.(png|jpeg|jpg)$/);
 
 /**
@@ -99,7 +94,7 @@ const defaultIsAssetManifestIcon = fileName =>
  *
  * @returns an object with width and height keys that describe the size of the image.
  */
-const defaultGetIconSize = fileName => {
+const defaultGetIconSize = (fileName) => {
   const dimension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)[1];
   return { width: dimension, height: dimension };
 };
@@ -113,7 +108,7 @@ const defaultGetIconSize = fileName => {
  *
  * @returns the mime type of the image, as inferred by the file extension.
  */
-const defaultGetIconType = fileName => {
+const defaultGetIconType = (fileName) => {
   const extension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)[2];
   return `image/${extension}`;
 };
@@ -161,65 +156,63 @@ class WebAppManifestPlugin {
   }
 
   apply(compiler) {
+    const pluginName = WebAppManifestPlugin.name;
+    const { webpack } = compiler;
+    const { Compilation } = webpack;
+    const { RawSource } = webpack.sources;
     /*
     This needs to be attached to the 'emit' event in order for the manifest file to be
     saved to the filesystem by Webpack
     */
-    compiler.hooks.emit.tap(this.name, compilation => {
-      /*
-      Builds up the icons object for the manifest by filtering through all of the
-      webpack assets and calculating the sizes and type of image from the fileName.
-      */
-      const { isAssetManifestIcon, getIconSize, getIconType } = this;
+    compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
+      compilation.hooks.processAssets.tap(
+        { name: pluginName, stage: Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE },
+        (assets) => {
+          /*
+            Builds up the icons object for the manifest by filtering through all of the
+            webpack assets and calculating the sizes and type of image from the fileName.
+          */
+          const { isAssetManifestIcon, getIconSize, getIconType } = this;
 
-      const iconAssets = Object.keys(compilation.assets)
-        .filter(fileName => isAssetManifestIcon(fileName))
-        .map(fileName => {
-          const size = getIconSize(fileName);
-          const sizes = `${size.width}x${size.height}`;
+          const iconAssets = Object.keys(assets)
+            .filter((fileName) => isAssetManifestIcon(fileName))
+            .map((fileName) => {
+              const size = getIconSize(fileName);
+              const sizes = `${size.width}x${size.height}`;
+              const type = getIconType(fileName);
 
-          const type = getIconType(fileName);
+              return { fileName, sizes, type };
+            });
 
-          return { fileName, sizes, type };
-        });
+          const icons = iconAssets.map(({ fileName, sizes, type }) => ({
+            type,
+            sizes,
+            src: `${trimSlashRight(compilation.options.output.publicPath)}/${fileName}`,
+          }));
 
-      const icons = iconAssets.map(({ fileName, sizes, type }) => ({
-        type,
-        sizes,
-        src: `${trimSlashRight(compilation.options.output.publicPath)}/${fileName}`,
-      }));
+          const content = JSON.stringify({ ...this.content, icons }, null, 2);
 
-      const content = JSON.stringify({ ...this.content, icons });
+          const normalizedDestination = normalizePath(this.destination);
+          let filename;
+          const hash = md5(content).substring(0, 8);
+          filename = `${normalizedDestination}/manifest-${hash}.json`;
 
-      const hash = md5(content).substring(0, 8);
-      const normalizedDestination = normalizePath(this.destination);
-      const filename = `${normalizedDestination}/manifest-${hash}.json`;
+          /*
+          This adds the app manifest as an asset to Webpack.
+          */
+          compilation.emitAsset(filename, new RawSource(content));
 
-      /*
-      This adds the app manifest as an asset to Webpack.
-      */
-      // eslint-disable-next-line security/detect-object-injection, no-param-reassign
-      compilation.assets[filename] = {
-        source: () => content,
-        size: () => content.length,
-
-        /*
-        emitted needs to be true so that this asset shows up in
-        compilation.getStats().assetsByChunkName, which is used by the AssetsPlugin to generate
-        the assets manifest. (yes, you're right -- there are too many things named manifest)
-        */
-        emitted: true,
-      };
-
-      /*
-      The web app manifest also needs to generate its own chunk so that it shows up in
-      compilation.getStats().assetsByChunkName. In this case, we are making a chunk called
-      'app-manifest' with just this file in it.
-      */
-      const chunk = new Chunk('app-manifest');
-      chunk.ids = [];
-      chunk.files = [filename];
-      compilation.chunks.push(chunk);
+          /*
+            The web app manifest also needs to generate its own chunk so that it shows up in
+            compilation.getStats().assetsByChunkName. In this case, we are making a chunk called
+            'app-manifest' with just this file in it.
+          */
+          const chunk = new webpack.Chunk('app-manifest');
+          chunk.ids = [];
+          chunk.files.add(filename);
+          compilation.chunks.add(chunk);
+        },
+      );
     });
   }
 }
