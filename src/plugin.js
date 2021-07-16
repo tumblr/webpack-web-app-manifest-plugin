@@ -67,7 +67,9 @@ function validatedManifestContent(manifestContent) {
 
   // Strip out undefined from validatedManifest
   Object.keys(validatedManifest).forEach((key) => {
+    // @ts-expect-error is this key a key of the object 🙀
     if (validatedManifest[key] === undefined) {
+      // @ts-expect-error is this key a key of the object 🙀
       delete validatedManifest[key];
     }
   });
@@ -97,7 +99,15 @@ const defaultIsAssetManifestIcon = (fileName) =>
  * @returns {Dimensions} an object with width and height keys that describe the size of the image.
  */
 const defaultGetIconSize = (fileName) => {
-  const dimension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)[1];
+  const match = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)?.[1];
+  const dimension = match && parseInt(match, 10);
+  if (!dimension || Number.isNaN(dimension)) {
+    throw new Error(
+      `Invalid icon dimension found ${JSON.stringify(dimension)} in filename ${JSON.stringify(
+        fileName,
+      )}`,
+    );
+  }
   return { width: dimension, height: dimension };
 };
 
@@ -111,7 +121,14 @@ const defaultGetIconSize = (fileName) => {
  * @returns the mime type of the image, as inferred by the file extension.
  */
 const defaultGetIconType = (fileName) => {
-  const extension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)[2];
+  const extension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)?.[2];
+  if (!extension) {
+    throw new Error(
+      `Invalid icon extension found ${JSON.stringify(extension)} in filename ${JSON.stringify(
+        fileName,
+      )}`,
+    );
+  }
   return `image/${extension}`;
 };
 
@@ -180,6 +197,11 @@ class WebAppManifestPlugin {
       compilation.hooks.processAssets.tap(
         { name: pluginName, stage: Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE },
         (assets) => {
+          const { publicPath } = compilation.options.output;
+          if (typeof publicPath !== 'string') {
+            throw new TypeError(`A string publicPath is required. Found ${publicPath}`);
+          }
+
           /*
             Builds up the icons object for the manifest by filtering through all of the
             webpack assets and calculating the sizes and type of image from the fileName.
@@ -199,7 +221,7 @@ class WebAppManifestPlugin {
           const icons = iconAssets.map(({ fileName, sizes, type }) => ({
             type,
             sizes,
-            src: `${trimSlashRight(compilation.options.output.publicPath)}/${fileName}`,
+            src: `${trimSlashRight(publicPath)}/${fileName}`,
           }));
 
           const content = JSON.stringify({ ...this.content, icons }, null, 2);
