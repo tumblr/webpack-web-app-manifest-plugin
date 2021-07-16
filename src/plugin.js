@@ -3,7 +3,7 @@ const md5 = require('md5');
 /**
  * Strips trailing slashes from `path`.
  *
- * @param {*} path
+ * @param {string} path
  * @returns `path` without trailing slashes.
  */
 function trimSlashRight(path) {
@@ -13,7 +13,7 @@ function trimSlashRight(path) {
 /**
  * Strips leading slashes from `path`.
  *
- * @param {*} path
+ * @param {string} path
  * @returns `path` without leading slashes.
  */
 function trimSlashLeft(path) {
@@ -23,7 +23,7 @@ function trimSlashLeft(path) {
 /**
  * Strips leading and trailing slashes from `path`.
  *
- * @param {*} path
+ * @param {string} path
  * @returns `path` without leading and trailing slashes.
  */
 function normalizePath(path) {
@@ -33,7 +33,7 @@ function normalizePath(path) {
 /**
  * Validates that all members of manifestContent are valid app manifest keys.
  *
- * @param {*} manifestContent An object representation of an app mainfest JSON.
+ * @param {ManifestContent} manifestContent An object representation of an app mainfest JSON.
  * @returns Content that is valid as an App Manifest key.
  */
 function validatedManifestContent(manifestContent) {
@@ -67,7 +67,9 @@ function validatedManifestContent(manifestContent) {
 
   // Strip out undefined from validatedManifest
   Object.keys(validatedManifest).forEach((key) => {
+    // @ts-expect-error is this key a key of the object 🙀
     if (validatedManifest[key] === undefined) {
+      // @ts-expect-error is this key a key of the object 🙀
       delete validatedManifest[key];
     }
   });
@@ -94,10 +96,19 @@ const defaultIsAssetManifestIcon = (fileName) =>
  *
  * @param {string} fileName The name of a file that is a webpack asset.
  *
- * @returns an object with width and height keys that describe the size of the image.
+ * @returns {Dimensions} an object with width and height keys that describe the size of the image.
  */
 const defaultGetIconSize = (fileName) => {
-  const dimension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)[1];
+  const match = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/);
+  const dimension = match && match[1] && parseInt(match[1], 10);
+  /* istanbul ignore if */
+  if (!dimension || Number.isNaN(dimension)) {
+    throw new Error(
+      `Invalid icon dimension found ${JSON.stringify(dimension)} in filename ${JSON.stringify(
+        fileName,
+      )}`,
+    );
+  }
   return { width: dimension, height: dimension };
 };
 
@@ -111,32 +122,49 @@ const defaultGetIconSize = (fileName) => {
  * @returns the mime type of the image, as inferred by the file extension.
  */
 const defaultGetIconType = (fileName) => {
-  const extension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)[2];
+  const match = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/);
+  const extension = match && match[2];
+  /* istanbul ignore if */
+  if (!extension) {
+    throw new Error(
+      `Invalid icon extension found ${JSON.stringify(extension)} in filename ${JSON.stringify(
+        fileName,
+      )}`,
+    );
+  }
   return `image/${extension}`;
 };
+
+/**
+ * @typedef Config
+ * @property {ManifestContent} content represents an object that will be validated and converted to JSON as the contents of the manifest file.
+ * @property {string} destination is an output path where the manifest file should be written.
+ * @property {(filename: string) => boolean} [isAssetManifestIcon] a function to determine if a webpack asset should be included as an icon in the web app manifest. The function accepts a `filename` parameter and returns true or false.
+ * @property {(filename: string) => Dimensions} [getIconSize] a function to determine the icon size of any asset that passes the check `isAssetManifestIcon()`. The function accepts a `fileName` parameter and returns an object `{ width, height }`.
+ * @property {(filename: string) => string} [getIconType] a function to determine the type of any asset that passes the check `isAssetManifestIcon()`. The function accepts a `fileName` parameter and returns a string describing the mime type of the asset, ex. "image/png".
+ *
+ * @typedef Dimensions
+ * @property {number} width
+ * @property {number} height
+ *
+ * @typedef ManifestContent
+ * @property {unknown} [name]
+ * @property {unknown} [short_name]
+ * @property {unknown} [start_url]
+ * @property {unknown} [display]
+ * @property {unknown} [background_color]
+ * @property {unknown} [theme_color]
+ * @property {unknown} [description]
+ * @property {unknown} [icons]
+ * @property {unknown} [related_applications]
+ * @property {unknown} [prefer_related_applications]
+ */
 
 class WebAppManifestPlugin {
   /**
    * Creates an instance of ManifestPlugin.
-   * @param {Object} { content, destination, isAssetManifestIcon, getIconSize, getIconType }
    *
-   *   `content` represents an object that will be validated and converted to JSON as the contents
-   *     of the manifest file.
-   *
-   *   `destination` is an output path where the manifest file should be written.
-   *
-   *   `isAssetManifestIcon` is a function to determine if a webpack asset should be included as an
-   *     icon in the web app manifest. The function accepts a `filename` parameter and returns true
-   *     or false.
-   *
-   *   `getIconSize` is a function to determine the icon size of any asset that passes the check
-   *     `isAssetManifestIcon()`. The function accepts a `fileName` parameter and returns an object
-   *     `{ width, height }`.
-   *
-   *   `getIconType` is a function to determine the type of any asset that passes the check
-   *     `isAssetManifestIcon()`. The function accepts a `fileName` parameter and returns a string
-   *     describing the mime type of the asset, ex. "image/png".
-   *
+   * @param {Config} Configuration object
    * @memberof ManifestPlugin
    */
   constructor({
@@ -157,6 +185,9 @@ class WebAppManifestPlugin {
     this.getIconType = getIconType;
   }
 
+  /**
+   * @param {import('webpack').Compiler} compiler
+   */
   apply(compiler) {
     const pluginName = WebAppManifestPlugin.name;
     const { webpack } = compiler;
@@ -170,6 +201,12 @@ class WebAppManifestPlugin {
       compilation.hooks.processAssets.tap(
         { name: pluginName, stage: Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE },
         (assets) => {
+          const { publicPath } = compilation.options.output;
+          /* istanbul ignore if */
+          if (typeof publicPath !== 'string') {
+            throw new TypeError(`A string publicPath is required. Found ${publicPath}`);
+          }
+
           /*
             Builds up the icons object for the manifest by filtering through all of the
             webpack assets and calculating the sizes and type of image from the fileName.
@@ -189,7 +226,7 @@ class WebAppManifestPlugin {
           const icons = iconAssets.map(({ fileName, sizes, type }) => ({
             type,
             sizes,
-            src: `${trimSlashRight(compilation.options.output.publicPath)}/${fileName}`,
+            src: `${trimSlashRight(publicPath)}/${fileName}`,
           }));
 
           const content = JSON.stringify({ ...this.content, icons }, null, 2);
