@@ -56,12 +56,13 @@
     },
     "reporters": [
       "default",
-      "jest-junit"
+      [
+        "jest-junit",
+        {
+          "outputDirectory": "./reports",
+          "outputName": "jest.xml"
+        }
+      ]
     ]
-  },
-  "jest-junit": {
-    "suiteName": "Jest Tests",
-    "output": "./reports/jest.xml",
-    "usePathForSuiteName": "true"
   }
 }
