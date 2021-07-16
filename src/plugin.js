@@ -101,6 +101,7 @@ const defaultIsAssetManifestIcon = (fileName) =>
 const defaultGetIconSize = (fileName) => {
   const match = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/);
   const dimension = match && match[1] && parseInt(match[1], 10);
+  /* istanbul ignore if */
   if (!dimension || Number.isNaN(dimension)) {
     throw new Error(
       `Invalid icon dimension found ${JSON.stringify(dimension)} in filename ${JSON.stringify(
@@ -123,6 +124,7 @@ const defaultGetIconSize = (fileName) => {
 const defaultGetIconType = (fileName) => {
   const match = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/);
   const extension = match && match[2];
+  /* istanbul ignore if */
   if (!extension) {
     throw new Error(
       `Invalid icon extension found ${JSON.stringify(extension)} in filename ${JSON.stringify(
@@ -199,6 +201,7 @@ class WebAppManifestPlugin {
         { name: pluginName, stage: Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE },
         (assets) => {
           const { publicPath } = compilation.options.output;
+          /* istanbul ignore if */
           if (typeof publicPath !== 'string') {
             throw new TypeError(`A string publicPath is required. Found ${publicPath}`);
           }
