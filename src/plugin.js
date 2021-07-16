@@ -99,8 +99,8 @@ const defaultIsAssetManifestIcon = (fileName) =>
  * @returns {Dimensions} an object with width and height keys that describe the size of the image.
  */
 const defaultGetIconSize = (fileName) => {
-  const match = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)?.[1];
-  const dimension = match && parseInt(match, 10);
+  const match = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/);
+  const dimension = match && match[1] && parseInt(match[1], 10);
   if (!dimension || Number.isNaN(dimension)) {
     throw new Error(
       `Invalid icon dimension found ${JSON.stringify(dimension)} in filename ${JSON.stringify(
@@ -121,7 +121,8 @@ const defaultGetIconSize = (fileName) => {
  * @returns the mime type of the image, as inferred by the file extension.
  */
 const defaultGetIconType = (fileName) => {
-  const extension = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/)?.[2];
+  const match = fileName.match(/manifest\/icon_(\d+)-\w*\.(png|jpeg|jpg)$/);
+  const extension = match && match[2];
   if (!extension) {
     throw new Error(
       `Invalid icon extension found ${JSON.stringify(extension)} in filename ${JSON.stringify(
