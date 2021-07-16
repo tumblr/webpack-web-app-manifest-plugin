@@ -47,6 +47,7 @@ function validatedManifestContent(manifestContent) {
     theme_color,
     description,
     icons,
+    prefer_related_applications,
     related_applications,
   } = manifestContent;
 
@@ -60,6 +61,7 @@ function validatedManifestContent(manifestContent) {
     theme_color,
     description,
     icons,
+    prefer_related_applications,
     related_applications,
   };
 
