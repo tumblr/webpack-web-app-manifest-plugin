@@ -157,6 +157,7 @@ const defaultGetIconType = (fileName) => {
  * @property {unknown} [description]
  * @property {unknown} [icons]
  * @property {unknown} [related_applications]
+ * @property {unknown} [prefer_related_applications]
  */
 
 class WebAppManifestPlugin {
