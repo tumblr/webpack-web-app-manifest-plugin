@@ -5,9 +5,11 @@
   "main": "index.js",
   "types": "types",
   "scripts": {
-    "test": "jest",
-    "test-coverage": "jest --coverage",
-    "clean": "rimraf .test-output ./types"
+    "build": "yarn tsc",
+    "clean": "rimraf .test-output ./types",
+    "prepublishOnly": "yarn run clean; yarn run build",
+    "test": "yarn tsc --noEmit --emitDeclarationOnly false && yarn jest",
+    "test-coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
