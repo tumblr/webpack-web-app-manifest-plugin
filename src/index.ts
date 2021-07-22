@@ -1,6 +1,5 @@
-import type * as Webpack from 'webpack';
+import type { Compiler } from 'webpack';
 import type { WebAppManifest } from 'web-app-manifest';
-import md5 from 'md5';
 
 /**
  * Strips trailing slashes from `path`.
@@ -137,11 +136,12 @@ class WebAppManifestPlugin {
     this.getIconType = getIconType;
   }
 
-  apply(compiler: Webpack.Compiler) {
+  apply(compiler: Compiler) {
     const pluginName = WebAppManifestPlugin.name;
     const { webpack } = compiler;
     const { Compilation } = webpack;
     const { RawSource } = webpack.sources;
+
     /*
     This needs to be attached to the 'emit' event in order for the manifest file to be
     saved to the filesystem by Webpack
@@ -181,9 +181,9 @@ class WebAppManifestPlugin {
           const content = JSON.stringify({ ...this.content, icons }, null, 2);
 
           const normalizedDestination = normalizePath(this.destination);
-          let filename;
-          const hash = md5(content).substring(0, 8);
-          filename = `${normalizedDestination}/manifest-${hash}.json`;
+          const hash = webpack.util.createHash('md5');
+          const digest = (hash.update(content).digest('hex') as string).substring(0, 8);
+          const filename = `${normalizedDestination}/manifest-${digest}.json`;
 
           /*
           This adds the app manifest as an asset to Webpack.
