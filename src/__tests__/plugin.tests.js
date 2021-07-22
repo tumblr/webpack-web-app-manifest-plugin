@@ -83,16 +83,6 @@ describe('webpack-web-app-manifest-plugin', () => {
     expect(manifest.icons).toHaveLength(2);
   });
 
-  it('filters invalid manifest keys out of the final manifest', async () => {
-    const plugin = new WebAppManifestPlugin({
-      content: { invalid_key: '12345' },
-      destination: '/manifest',
-    });
-
-    const [manifest] = await runCompilation(plugin);
-    expect(manifest.invalid_key).toBeUndefined();
-  });
-
   it('allows valid manifest keys to pass through to the final manifest', async () => {
     const plugin = new WebAppManifestPlugin({
       content: {

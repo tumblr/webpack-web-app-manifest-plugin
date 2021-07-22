@@ -1,12 +1,6 @@
 import type * as Webpack from 'webpack';
-import type {
-  DisplayModeType,
-  ExternalApplicationResource,
-  ImageResource,
-  WebAppManifest,
-} from 'web-app-manifest';
+import type { WebAppManifest } from 'web-app-manifest';
 import md5 from 'md5';
-import assert from 'assert';
 
 /**
  * Strips trailing slashes from `path`.
@@ -36,105 +30,6 @@ function trimSlashLeft(path: string): string {
  */
 function normalizePath(path: string): string {
   return trimSlashRight(trimSlashLeft(path));
-}
-
-type ManifestConfig = { [K in keyof WebAppManifest]?: unknown };
-
-function assertNullableString(x: unknown): asserts x is undefined | string {
-  assert(typeof x === 'undefined' || typeof x === 'string');
-}
-function assertNullableBoolean(x: unknown): asserts x is undefined | boolean {
-  assert(typeof x === 'undefined' || typeof x === 'boolean');
-}
-function assertNullableDisplayMode(x: unknown): asserts x is undefined | DisplayModeType {
-  assert(typeof x === 'undefined' || (DISPLAY_MODES as Set<unknown>).has(x));
-}
-function assertImageResource(x: unknown): asserts x is ImageResource {
-  assert(
-    // @ts-expect-error
-    x != null && typeof x === 'object' && typeof x.src === 'string',
-  );
-}
-function assertExternalApplicationResource(x: unknown): asserts x is ExternalApplicationResource {
-  assert(
-    // @ts-expect-error
-    x != null && typeof x === 'object' && typeof x.platform === 'string',
-  );
-}
-
-const DISPLAY_MODES = new Set<DisplayModeType>([
-  'fullscreen',
-  'standalone',
-  'minimal-ui',
-  'browser',
-]);
-
-/**
- * Validates that all members of manifestContent are valid app manifest keys.
- *
- * @param manifestContent An object representation of an app mainfest JSON.
- * @returns Content that is valid as an App Manifest key.
- */
-function validateManifestContent(manifestContent: ManifestConfig): WebAppManifest {
-  // Pulls all known keys out of the manifest content object
-  const {
-    background_color,
-    description,
-    display,
-    icons,
-    lang,
-    name,
-    prefer_related_applications,
-    related_applications,
-    short_name,
-    start_url,
-    theme_color,
-  } = manifestContent;
-
-  assertNullableString(background_color);
-  assertNullableString(description);
-  assertNullableString(display);
-  assertNullableString(lang);
-  assertNullableString(name);
-  assertNullableBoolean(prefer_related_applications);
-  assertNullableString(related_applications);
-  assertNullableString(short_name);
-  assertNullableString(start_url);
-  assertNullableString(theme_color);
-  assert(
-    typeof icons === 'undefined' || (Array.isArray(icons) && icons.forEach(assertImageResource)),
-  );
-  assert(
-    typeof related_applications === 'undefined' ||
-      (Array.isArray(related_applications) &&
-        related_applications.forEach(assertExternalApplicationResource)),
-  );
-  assertNullableDisplayMode(display);
-
-  // Construct an object with the known keys
-  const validatedManifest = {
-    name,
-    short_name,
-    start_url,
-    display,
-    background_color,
-    theme_color,
-    description,
-    icons,
-    prefer_related_applications,
-    related_applications,
-  };
-
-  // Clean undefined (and null) values
-  for (const prop in validateManifestContent) {
-    // @ts-expect-error implicit any
-    if (validateManifestContent[prop] == null) {
-      // @ts-expect-error implicit any
-      delete validateManifestContent[prop];
-    }
-  }
-
-  return validatedManifest;
 }
 
 /**
@@ -222,10 +117,7 @@ class WebAppManifestPlugin {
   getIconType: NonNullable<Config['getIconType']>;
 
   /**
-   * Creates an instance of ManifestPlugin.
-   *
    * @param Configuration object
-   * @memberof ManifestPlugin
    */
   constructor({
     content,
@@ -236,7 +128,7 @@ class WebAppManifestPlugin {
   }: Config) {
     this.name = 'webpack-web-app-manifest';
 
-    this.content = validateManifestContent(content);
+    this.content = content;
 
     this.destination = destination;
 
