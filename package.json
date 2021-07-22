@@ -21,9 +21,7 @@
   "author": "Paul Rehkugler",
   "license": "MIT",
   "dependencies": {
-    "@types/md5": "^2.2.1",
-    "@types/web-app-manifest": "^1.0.2",
-    "md5": "^2.2.1"
+    "@types/web-app-manifest": "^1.0.2"
   },
   "peerDependencies": {
     "webpack": "^5.0.0"
@@ -32,8 +30,11 @@
     "@babel/core": "^7.14.8",
     "@babel/preset-env": "^7.14.8",
     "@babel/preset-typescript": "^7.14.5",
+    "@types/glob": "^7.1.4",
+    "@types/jest": "^26.0.24",
     "@types/node": "^15.12.2",
     "file-loader": "^6.2.0",
+    "glob": "^7.1.7",
     "jest": "^27.0.6",
     "jest-junit": "^12.2.0",
     "prettier": "^2.3.0",
