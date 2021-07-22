@@ -1,4 +1,4 @@
-const WebAppManifestPlugin = require('webpack-web-app-manifest-plugin');
+const WebAppManifestPlugin = require('..');
 const { webpack } = require('webpack');
 const path = require('path');
 const fs = require('fs/promises');
@@ -60,11 +60,7 @@ describe('webpack-web-app-manifest-plugin', () => {
           try {
             const contents = JSON.parse(
               await fs.readFile(
-                path.join(
-                  distPath,
-                  plugin.destination,
-                  `manifest-hash.json`,
-                ),
+                path.join(distPath, plugin.destination, `manifest-hash.json`),
                 'utf-8',
               ),
             );
