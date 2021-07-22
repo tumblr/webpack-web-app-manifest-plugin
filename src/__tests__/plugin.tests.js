@@ -1,4 +1,4 @@
-const WebAppManifestPlugin = require('webpack-web-app-manifest-plugin');
+const WebAppManifestPlugin = require('..');
 const { webpack } = require('webpack');
 const path = require('path');
 const fs = require('fs/promises');
@@ -60,11 +60,7 @@ describe('webpack-web-app-manifest-plugin', () => {
           try {
             const contents = JSON.parse(
               await fs.readFile(
-                path.join(
-                  distPath,
-                  plugin.destination,
-                  `manifest-hash.json`,
-                ),
+                path.join(distPath, plugin.destination, `manifest-hash.json`),
                 'utf-8',
               ),
             );
@@ -85,16 +81,6 @@ describe('webpack-web-app-manifest-plugin', () => {
 
     const [manifest] = await runCompilation(plugin);
     expect(manifest.icons).toHaveLength(2);
-  });
-
-  it('filters invalid manifest keys out of the final manifest', async () => {
-    const plugin = new WebAppManifestPlugin({
-      content: { invalid_key: '12345' },
-      destination: '/manifest',
-    });
-
-    const [manifest] = await runCompilation(plugin);
-    expect(manifest.invalid_key).toBeUndefined();
   });
 
   it('allows valid manifest keys to pass through to the final manifest', async () => {
