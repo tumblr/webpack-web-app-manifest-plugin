@@ -3,8 +3,7 @@ const { webpack } = require('webpack');
 const path = require('path');
 const fs = require('fs/promises');
 const rimraf = require('rimraf').sync;
-
-jest.mock('md5', () => () => 'hash');
+const glob = require('glob').sync;
 
 const distPath = path.join(__dirname, '..', '..', '.test-output');
 
@@ -57,17 +56,10 @@ describe('webpack-web-app-manifest-plugin', () => {
           if (stats.hasErrors()) {
             reject(stats);
           }
-          try {
-            const contents = JSON.parse(
-              await fs.readFile(
-                path.join(distPath, plugin.destination, `manifest-hash.json`),
-                'utf-8',
-              ),
-            );
-            resolve([contents, stats]);
-          } catch (e) {
-            reject(e);
-          }
+
+          const manifestFile = glob(path.join(distPath, plugin.destination, `manifest-*.json`))[0];
+          const contents = JSON.parse(await fs.readFile(manifestFile, 'utf-8'));
+          resolve([contents, stats]);
         },
       );
     });
@@ -212,7 +204,7 @@ describe('webpack-web-app-manifest-plugin', () => {
     expect(manifest).toBeTruthy();
 
     expect(stats.toJson().assetsByChunkName['app-manifest']).toEqual([
-      'web-app-manifest/manifest-hash.json',
+      expect.stringMatching(/web-app-manifest\/manifest-[0-9a-f]{8}\.json/),
     ]);
   });
 });
