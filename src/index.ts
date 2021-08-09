@@ -181,7 +181,7 @@ class WebAppManifestPlugin {
           const content = JSON.stringify({ ...this.content, icons }, null, 2);
 
           const normalizedDestination = normalizePath(this.destination);
-          const hash = webpack.util.createHash('md5');
+          const hash = webpack.util.createHash('md4');
           const digest = (hash.update(content).digest('hex') as string).substring(0, 8);
           const filename = `${normalizedDestination}/manifest-${digest}.json`;
 
