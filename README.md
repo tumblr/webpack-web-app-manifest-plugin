@@ -20,25 +20,43 @@ yarn add webpack-web-app-manifest-plugin --dev
 
 Name all of your icon files `manifest/icon_[square dimension].(png|jpeg|jpg)`. If you have a different naming scheme for your files, check out the section [Using it the hard way](#using-it-the-hard-way) below.
 
+When using [webpack asset modules](https://webpack.js.org/guides/asset-modules/) you will have a configuration section like this to produce the icon assets:
+
+```js
+{
+  module: {
+    rules: [
+      // Manifest icons
+      {
+        test: /\.png$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'manifest/[name]-[contenthash:8][ext][query]',
+        },
+      },
+    ],
+  },
+}
+```
+
 In your webpack config file:
 
 ```js
 import AppManifestPlugin from 'webpack-web-app-manifest-plugin';
 
-...
-
-plugins: [
-  new AppManifestPlugin({
-    content: {
-      name: 'Tumblr',
-      short_name: 'Tumblr',
-      background_color: '#36465d',
-    },
-    destination: '/manifest',
-  }),
-],
-
-...
+{
+  // …
+  plugins: [
+    new AppManifestPlugin({
+      content: {
+        name: 'Tumblr',
+        short_name: 'Tumblr',
+        background_color: '#36465d',
+      },
+      destination: '/manifest',
+    }),
+  ],
+}
 ```
 
 To access the app manifest file path from your asset manifest:
@@ -46,8 +64,6 @@ To access the app manifest file path from your asset manifest:
 ```jsx
 const manifest = // however you usually access your asset manifest in code
 const appManifestPath = manifest['app-manifest'].json;
-
-...
 
 <link rel="manifest" href={appManifestPath} />
 ```
