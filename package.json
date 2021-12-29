@@ -55,6 +55,9 @@
     "collectCoverageFrom": [
       "src/**/*.ts"
     ],
+    "watchPathIgnorePatterns": [
+      "dist"
+    ],
     "testURL": "http://localhost/",
     "coverageDirectory": "./reports/coverage",
     "coverageThreshold": {

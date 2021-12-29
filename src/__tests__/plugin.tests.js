@@ -1,9 +1,10 @@
-const WebAppManifestPlugin = require('..');
+const WebAppManifestPlugin = require('..').default;
 const { webpack } = require('webpack');
 const path = require('path');
 const fs = require('fs/promises');
 const rimraf = require('rimraf').sync;
 const glob = require('glob').sync;
+const { execSync } = require('child_process');
 
 const distPath = path.join(__dirname, '..', '..', '.test-output');
 
@@ -398,5 +399,16 @@ describe('Using asset modules', () => {
     expect(stats.toJson().assetsByChunkName['app-manifest']).toEqual([
       expect.stringMatching(/web-app-manifest\/manifest-[0-9a-f]{8}\.json/),
     ]);
+  });
+});
+
+describe('CommonJS and ESM imports are compatible', () => {
+  beforeAll(() => {
+    execSync('yarn build');
+  });
+  it('exposes the same plugin', async () => {
+    const { default: esmPlugin } = await import('webpack-web-app-manifest-plugin');
+    const { default: cjsPlugin } = require('webpack-web-app-manifest-plugin');
+    expect(esmPlugin).toBe(cjsPlugin);
   });
 });
