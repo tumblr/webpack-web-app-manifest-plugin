@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking** Package for better consumption from ECMAScript modules. CommonJS consumers must now
+  `require('webpack-web-app-manifest-plugin').default` to access the plugin.
+
 ### Removed
 
 - Drop support for Node.js < 12 (current LTS maintenance release).
