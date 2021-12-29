@@ -17,7 +17,13 @@
   "engines": {
     "node": ">=10.13.0"
   },
-  "keywords": ["pwa", "webpack", "web", "app", "manifest"],
+  "keywords": [
+    "pwa",
+    "webpack",
+    "web",
+    "app",
+    "manifest"
+  ],
   "author": "Paul Rehkugler",
   "license": "MIT",
   "dependencies": {
@@ -43,8 +49,12 @@
     "webpack": "^5.0.0"
   },
   "jest": {
-    "testMatch": ["**/*.tests.js"],
-    "collectCoverageFrom": ["src/**/*.ts"],
+    "testMatch": [
+      "**/*.tests.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts"
+    ],
     "testURL": "http://localhost/",
     "coverageDirectory": "./reports/coverage",
     "coverageThreshold": {
@@ -65,5 +75,6 @@
         }
       ]
     ]
-  }
+  },
+  "packageManager": "yarn@3.1.1"
 }
