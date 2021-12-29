@@ -1712,10 +1712,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^15.12.2":
-  version: 15.14.2
-  resolution: "@types/node@npm:15.14.2"
-  checksum: 0be88677d1f0322dd986e347b4aa8c7115759a52e4d57bec8cab5ef90d581d89d8854cab862166515bb9a3834611d5832f75061af5193e13c8255a46fd1f59ac
+"@types/node@npm:^12.20.39":
+  version: 12.20.39
+  resolution: "@types/node@npm:12.20.39"
+  checksum: 6bf9fe4317e472f0f00d3f98afa18307765271994b09f9ba6b2c5f4f35478b55642d1c3c7d3e61dbec5df5ba3159aa9820bd8f420fc9f332e8ee067ffc7ce35c
   languageName: node
   linkType: hard
 
@@ -5403,7 +5403,7 @@ __metadata:
     "@babel/preset-typescript": ^7.16.5
     "@types/glob": ^7.2.0
     "@types/jest": ^27.0.3
-    "@types/node": ^15.12.2
+    "@types/node": ^12.20.39
     "@types/web-app-manifest": ^1.0.2
     file-loader: ^6.2.0
     glob: ^7.2.0
