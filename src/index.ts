@@ -107,7 +107,7 @@ export interface Dimensions {
   height: number;
 }
 
-class WebAppManifestPlugin {
+export default class WebAppManifestPlugin {
   name: string;
   content: WebAppManifest;
   destination: string;
@@ -204,5 +204,3 @@ class WebAppManifestPlugin {
     });
   }
 }
-
-module.exports = WebAppManifestPlugin;
