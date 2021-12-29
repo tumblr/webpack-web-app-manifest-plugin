@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Document support for webpack 5 asset modules.
 
-##[4.0.0] - 2021-08-09
+## [4.0.0] - 2021-08-09
 
 ### Added
 
