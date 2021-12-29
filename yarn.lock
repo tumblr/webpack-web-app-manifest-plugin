@@ -1612,13 +1612,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/glob@npm:^7.1.4":
-  version: 7.1.4
-  resolution: "@types/glob@npm:7.1.4"
+"@types/glob@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "@types/glob@npm:7.2.0"
   dependencies:
     "@types/minimatch": "*"
     "@types/node": "*"
-  checksum: 6911a956448f5eddea1e4371f814bf92072e8ceedba83de6ce2a6745938a6f0327376e1c0072fa0d7b3b73d84e255aafda53c1dff148225cfe542a8cc5d54b02
+  checksum: 6ae717fedfdfdad25f3d5a568323926c64f52ef35897bcac8aca8e19bc50c0bd84630bbd063e5d52078b2137d8e7d3c26eabebd1a2f03ff350fff8a91e79fc19
   languageName: node
   linkType: hard
 
@@ -3040,9 +3040,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^7.1.1, glob@npm:^7.1.2, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.1.7":
-  version: 7.1.7
-  resolution: "glob@npm:7.1.7"
+"glob@npm:^7.1.1, glob@npm:^7.1.2, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "glob@npm:7.2.0"
   dependencies:
     fs.realpath: ^1.0.0
     inflight: ^1.0.4
@@ -3050,7 +3050,7 @@ __metadata:
     minimatch: ^3.0.4
     once: ^1.3.0
     path-is-absolute: ^1.0.0
-  checksum: b61f48973bbdcf5159997b0874a2165db572b368b931135832599875919c237fc05c12984e38fe828e69aa8a921eb0e8a4997266211c517c9cfaae8a93988bb8
+  checksum: 78a8ea942331f08ed2e055cb5b9e40fe6f46f579d7fd3d694f3412fe5db23223d29b7fee1575440202e9a7ff9a72ab106a39fee39934c7bedafe5e5f8ae20134
   languageName: node
   linkType: hard
 
@@ -5364,12 +5364,12 @@ __metadata:
     "@babel/core": ^7.14.8
     "@babel/preset-env": ^7.14.8
     "@babel/preset-typescript": ^7.14.5
-    "@types/glob": ^7.1.4
+    "@types/glob": ^7.2.0
     "@types/jest": ^27.0.3
     "@types/node": ^15.12.2
     "@types/web-app-manifest": ^1.0.2
     file-loader: ^6.2.0
-    glob: ^7.1.7
+    glob: ^7.2.0
     jest: ^27.4.5
     jest-junit: ^13.0.0
     prettier: ^2.3.0
