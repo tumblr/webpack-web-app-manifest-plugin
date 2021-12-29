@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Provide TypeScript declaration files.
+- Support for [`prefer_related_applications`](https://developer.mozilla.org/en-US/docs/Web/Manifest/prefer_related_applications).
 
 ### Changed
 
