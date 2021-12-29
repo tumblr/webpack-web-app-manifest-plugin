@@ -8,7 +8,7 @@
     "clean": "yarn rimraf .test-output dist",
     "prepublishOnly": "yarn clean; yarn build",
     "test": "yarn tsc --noEmit && yarn jest",
-    "test-coverage": "yarn jest --coverage"
+    "test-coverage": "yarn test --coverage"
   },
   "repository": {
     "type": "git",
