@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2022-04-29
+
+- **Breaking** Package for better consumption from CommonJS or ECMAScript modules. The v5 changes
+  did not behave as expected, we expect these changes to work well for both CJS and ESM consumers.
+
 ## [5.0.0] - 2021-12-30
 
 ### Changed
