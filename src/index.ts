@@ -89,7 +89,7 @@ const defaultGetIconType = (fileName: string): `image/${string}` => {
   return `image/${extension}`;
 };
 
-export interface Config {
+interface Config {
   /** Represents an object that will be validated and converted to JSON as the contents of the manifest file. */
   content: Omit<WebAppManifest, 'icons'>;
   /** An output path where the manifest file should be written. */
@@ -102,12 +102,12 @@ export interface Config {
   getIconType?: (filename: string) => string;
 }
 
-export interface Dimensions {
+interface Dimensions {
   width: number;
   height: number;
 }
 
-export default class WebAppManifestPlugin {
+export = class WebAppManifestPlugin {
   name: string;
   content: WebAppManifest;
   destination: string;
@@ -203,4 +203,4 @@ export default class WebAppManifestPlugin {
       );
     });
   }
-}
+};
